@@ -20,6 +20,17 @@
 \usepackage{times}
 \usepackage{url}
 \usepackage{latexsym}
+\usepackage{hyperref}
+\usepackage{algorithm}
+\usepackage[numbers]{natbib}
+\usepackage{algpseudocode}
+\usepackage{algorithmicx} 
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{svg}
+\usepackage[justification=centering]{caption} 
+% maxnames=2 → Show names normally up to 2 authors
+% minnames=1 → Show only "First Author et al." if 3+ authors
 
 %\setlength\titlebox{5cm}
 
@@ -29,18 +40,21 @@
 % in the camera-ready version and ask you to change it back.
 
 
-\title{Instructions for ACL-2015 Proceedings}
 
-\author{First Author \\
-  Affiliation / Address line 1 \\
-  Affiliation / Address line 2 \\
-  Affiliation / Address line 3 \\
-  {\tt email@domain} \\\And
-  Second Author \\
-  Affiliation / Address line 1 \\
-  Affiliation / Address line 2 \\
-  Affiliation / Address line 3 \\
-  {\tt email@domain} \\}
+
+\title{Exploring the Impact of Vectorized vs. Non-Vectorized Graph Features on the Performance of Random Forest Classification for Malware Detection
+}
+
+\author{Chantal Ariu\\ \\
+  {\tt car103} \\\And
+  Lea Chahboun\\ \\
+  {\tt lch227} \\\And
+  Alex Hilayel\\ \\
+  {\tt chr696} \\\And
+  Max Rǎulea\\ \\
+  {\tt mra296} \\\And
+  Jari Roossien\\ \\
+  {\tt jro246} \\}
 
 \date{}
 
@@ -56,69 +70,230 @@
   reported in this document.
 \end{abstract}
 
-\section{Credits}
-
-This document has been adapted from the instructions for earlier ACL
-proceedings, including those for ACL-2012 by Maggie Li and Michael
-White, those from ACL-2010 by Jing-Shing Chang and Philipp Koehn,
-those for ACL-2008 by Johanna D. Moore, Simone Teufel, James Allan,
-and Sadaoki Furui, those for ACL-2005 by Hwee Tou Ng and Kemal
-Oflazer, those for ACL-2002 by Eugene Charniak and Dekang Lin, and
-earlier ACL and EACL formats. Those versions were written by several
-people, including John Chen, Henry S. Thompson and Donald
-Walker. Additional elements were taken from the formatting
-instructions of the {\em International Joint Conference on Artificial
-  Intelligence}.
-
 \section{Introduction}
 
-The following instructions are directed to authors of papers submitted
-to ACL-2015 or accepted for publication in its proceedings. All
-authors are required to adhere to these specifications. Authors are
-required to provide a Portable Document Format (PDF) version of their
-papers. \textbf{The proceedings are designed for printing on A4
-paper.}
+Malware, an abbreviation for \textbf{Mal}icious Soft\textbf{ware} encompasses all types of programs that are intentionally designed to cause harm or undesirable action to a system \footnote{\href{https://www.myrasecurity.com/en/malware}{https://www.myrasecurity.com/en/malware/}}.
+“System” in this case does not only refer to individual machines, but also extends to larger systems such as IoT devices, government controls, as well as educational and healthcare institutions. According to the AV-TEST institute, nearly 941 million instances of Windows malware have been registered\footnote{\label{note2} \href{https://portal.av-atlas.org/malware/statistics}{https://portal.av-atlas.org/malware/statistics}}, with a growth of close to 20 million instances registered since the beginning of 2025\footref{note2}. Daily statistics from the institute report an average of 450,000 new malware instances, highlighting the pressure placed on cybersecurity engineers to develop and provide effective and safe countermeasures.
 
-We will make more detailed instructions available at
-\url{http://acl2015.org/publication.html}. Please check this website 
-regularly.
+Consequently, the main focus for cybersecurity researchers has always been to create and refine methods for detecting malware reliably. Traditional, signature-based detection algorithms, had quickly proven incapable for detecting new or previously unseen malware due to their reactive nature \cite{inbook}. Therefore, machine learning techniques have now become the standard of modern-day malware detection approaches.
 
+Over the past few years, graph representations have been explored by various researchers and successfully emerged as an effective way to represent input features, positively influencing malware detection accuracy \cite{9023948}. Graph representations and their usefulness in this field of application is not yet fully described, forming the main motivation for the focus of this paper.
 
-\section{General Instructions}
+In the study presented in this paper, Function Call Graphs (FCGs), constructed from disassembled binaries, have been explored as input features. NetworkX, a python library for graph analysis, was then used for deriving structural features from the FCGs, which form the input for the machine learning model. Additionally, vectorized representations of FCGs, referred to as FCGVs throughout this paper, are generated using Node2Vec \cite{grover2016node2vecscalablefeaturelearning}.
 
-Manuscripts must be in two-column format.  Exceptions to the
-two-column format include the title, authors' names and complete
-addresses, which must be centered at the top of the first page, and
-any full-width figures or tables (see the guidelines in
-Subsection~\ref{ssec:first}). {\bf Type single-spaced.}  Start all
-pages directly under the top margin. See the guidelines later
-regarding formatting the first page.  The manuscript should be
-printed single-sided and its length
-should not exceed the maximum page limit described in Section~\ref{sec:length}.
-Do not number the pages.
+This report aims to investigate the efficacy of a Random Forest (RF) Classifier in classifying binary executable files as either benign or malware, focusing specifically on the impact of vectorized versus non-vectorized representations of FCGs. Based on the purpose of this study, the research question (RQ) guiding this study is the following.
 
+\begin{center}
+    "How do vectorized versus non-vectorized graph representations function call graphs impact the performance metrics of Random Forest Classifiers in detecting malicious portable executable files?"
+\end{center}
 
-\subsection{Electronically-available resources}
+Throughout this paper, this research question will be answered by comparing the performance of a Random Forest Classifier trained on different graph representations extracted from the input executable file. 
 
-We strongly prefer that you prepare your PDF files using \LaTeX\ with
-the official ACL 2015 style file (acl2015.sty) and bibliography style
-(acl.bst). These files are available at
-\url{http://acl2015.org}. You will also find the document
-you are currently reading (acl2015.pdf) and its \LaTeX\ source code
-(acl2015.tex) on this website.
+\section{Related Work}
+In this section, related work is presented with the goal of providing an overview of the current state of malware detection techniques. The focus will primarily be on graph representations and random forest classifications, to provide necessary context for following this paper. However, traditional malware detection methods, as well as modern machine learning detection methods will also be covered. Finally, this section will conclude with a discussion about gaps in the literature and the place of this study within the broader literature context.
 
-You can alternatively use Microsoft Word to produce your PDF file. In
-this case, we strongly recommend the use of the Word template file
-(acl2015.dot) on the ACL 2015 website (\url{http://acl2015.org}). 
-If you have an option, we recommend that you use the \LaTeX2e version. 
-If you will be using the Microsoft Word template, we suggest that you 
-anonymize your source file so that the pdf produced does not retain your
-identity.  This can be done by removing any personal information
-from your source document properties.
+\subsection{Traditional Detection Methods}
+
+One well-known and traditional method for malware classification is signature-based detection \cite{kaspersky_ml_whitepaper}, which is an effective and simple technique to detect known malware. It works by creating a signature, which is a unique identifier of a malware feature that incorporates the program structure of the particular malware file \cite{8949524}. These signatures are then used to identify unseen malware files by flagging them if there is a complete match between the signature of the unseen file and any of the signatures of the known malware files. However, this method presents significant drawbacks, namely being unable to detect malware for which signatures have not yet been created and added to the detector. Additionally, extracting signatures requires a lot of computing power [\cite{inbook}, \cite{8949524}], which is also one of the main reasons cybersecurity researchers have started exploring different methods.
+
+In 2007, Harley and Lee published a paper detailing the use of heuristic analysis for the detection of unknown malware \cite{eset_heuristic_analysis}, describing a promising solution to the main limitation of signature-based detection methods, detecting new and/or previously unseen malware. 
+Heuristic methods work by identifying patterns in suspicious programs to draw a conclusion. The main tool used for heuristic methods is static analysis, which means that the identification happens before the program is ever executed. Despite heuristic methods being a significant improvement upon signature-based methods, there are significant limitations associated with heuristic methods as well, more specifically, the tendency to produce false alarms, referring to a rather high false positive rate (FPR). As described in a white paper on machine learning for malware detection by Kaspersky Lab \cite{kaspersky_ml_whitepaper}, the FPR is what needs to be minimized the most when thinking about the creation of a product to protect a user from malware. This is especially the case today, since more individuals are turning to malware protection software with the rise of threats \footnote{\href{https://www.security.org/antivirus/antivirus-consumer-report-annual/}{https://www.security.org/antivirus/antivirus-consumer-report-annual/}}. 
 
 
+\subsection{Machine Learning in Malware Detection}
 
-\subsection{Format of Electronic Manuscript}
+After traditional and early techniques started being less effective in the correct classification of malware, as well as keeping up with the constantly evolving malware files that are produced, machine learning algorithms have emerged as a powerful tool for malware detection, mainly due to its ability to adapt to changes in malware, as well as identifying previously unseen malware. Various machine learning techniques, including deep learning and ensemble methods, have shown promising results in terms of reliability of detecting complex patterns in malware file structure. 
+For instance, Convolutional Neural Networks (CNNs) have been successfully used to convert malware into image representations for the classification of various malware families with high accuracy [\cite{sym14112304}, \cite{10830884}].These image representations allow CNNs to utilize their strengths in pattern recognition to identify malware. 
+Recurrent Neural Networks (RNNs), and more specifically Long Short-Term Memory (LSTM) networks, which are known to be useful for analyzing sequential data \cite{ALSELWI2024102068}, have also been applied to malware analysis. More specifically, their applicability in this context stems from modeling the execution behavior of a program and using that as input to the model. As shown by \cite{catak2020deep}, using LSTM networks to analyze API calls in Windows portable executable (PE) files achieved high accuracy in detecting malware. 
+Lastly, Graph Neural Networks (GNNs), which are designed to handle graph-structured data \cite{khemani2024review}, are applied in the field of malware detection and classification by being used to analyze the relationships between different components of malware. For instance,\cite{malhotra2023comparisongraphneuralnetworks} discovered that using GNN models outperform other well-known techniques and additionally also highlighting that their GNN models were not as affected by the issue of overfitting compared to non-GNN techniques. 
+
+\subsection{Graph Representations}
+There are various types of graph representation that are used in malware detection, such as Function Call Graphs (FCGs), System call dependency graphs, and Control Flow Graphs (CFGs). [\cite{9023948}, \cite{AMJATH2025103651}]. These representations are particularly useful because they capture both the structural and behavioral characteristics of a program, providing a comprehensive view of how different components interact, which is essential for identifying malicious behavior. Despite their effectiveness, traditional graph representations encompass a computationally intensive extraction process and the resulting graphs are often complex and difficult to analyze. Additionally, not all necessary information for accurate malware detection may be captured by these representations, leading to suboptimal classification accuracy [\cite{9023948}, \cite{10.1145/3664649}].This highlights the need for more advanced techniques that can effectively handle the complexities of malware while maintaining computational efficiency.
+
+\subsubsection{Vectorization Techniques}
+In order to counter these limitations, researchers have explored various vectorization techniques of graph representations [\cite{hashemi2017graph}, \cite{9023948}, \cite{10.1145/3664649}, \cite{AMJATH2025103651}]. One popular method, which is also used in this study, is Node2Vec\footnote{\href{https://snap.stanford.edu/node2vec/}{https://snap.stanford.edu/node2vec/}}, which uses random walks to capture structural properties of the graph it receives as input and then converts it into a dense vector representation. 
+
+\subsection{Random Forest Classifiers}
+The Random Forest (RF) classification algorithm is an ensemble learning method that constructs multiple decision trees during training and outputs the mode of the classes, in the case of a classification task, or the mean prediction, in the case of a regression task, of each individual tree. RF classifiers are known for their ability to effectively manage large datasets with numerous features and are less prone to overfitting compared to single decision trees \cite{breiman2001random}. In one of the early studies by Breiman, the RF algorithm is first introduced and it states several advantages, such as robustness despite large and complex datasets, accuracy, handling of imbalance data, and scalability. 
+In the context of malware detection, RF has been used for the classification of binary executable files as benign or malicious, and its ability to handle a large number of features and being suitable for analyzing complex malware datasets has yielded high accuracy results in a study by Garcia and Muga \cite{article}. 
+
+\subsection{Gaps in Literature}
+The aim of this section was to provide more context on the relevant background needed for this study. Clearly, there is an abundant amount of research on the applicability of machine learning techniques in the detection of malware and its classification. However, the research is not complete, as there are identifiable gaps in terms of specialized methods and their effect on the effectiveness of an algorithm. As described by \cite{9023948}, their comprehensive study on graph-based, as well as non graph-based features, including vectorization methods and RF classifiers, is only able to classify malware depending on its type. The proposal for future work by \cite{9023948} was to extend the scope to malware detection, rather than only malware classification. The goal of this study is to make further progress in the area of malware detection using graph-based methods, extending the work done by not only \cite{9023948} but all other work discussed in the works prior.
+
+\section{Data Pre-processing}
+
+The dataset chosen for this study is DikeDataset\footnote{\href{https://github.com/iosifache/DikeDataset}{https://github.com/iosifache/DikeDataset}}, which is an open source dataset consisting of labeled benign and malicious files. The dataset contains 1,082 benign and 10,841 malware samples, split between Portable Executable (PE) files and Object Linking and Embedding (OLE) files. The scope of this study, as described in the research question, is focused specifically on the classification of PE files. Therefore, data cleaning was a necessary preliminary step to prepare the data for further processing.
+
+\subsection{Data Cleaning}
+In the dataset, files with a label of '0' are for PE files, including both benign and malware samples, while a label of '1' would indicate an OLE file.
+Since the goal is to exclusively include PE files for this study, the data cleaning begins by checking the label of every element in each of the two .csv files (one containing benign, the other malware samples), and creating two new .csv files which now consist of only benign PE samples and PE malware samples, respectively. The name of each file, represented by an entry in the .csv files, is used as a key, and a DataEntry object is created to store whether the file is malicious (True) or benign (False). Since the type of malware is not relevant for the purpose of this paper, all malicious files are grouped together without distinguishing between different families.
+
+And after completing this preliminary data cleaning step, the dataset that is going to be used throughout the rest of this paper consists of 982 benign PE file samples and 8,954 PE malware file samples.
+
+
+\subsection{FCG Generation}
+As stated in the research question, this paper focuses on inputs that are transformed from simple numerical features into graph representations of executable files, more specifically, the Function Call Graph (FCG) representation. However, in order to generate the FCGs, it is required to first disassemble the executable files into binaries, since binaries are where the graphical representations can be constructed from. 
+
+For the system, a 2-step process is implemented to prepare the data for the model. The initial step consists of generating FCGs from the executable file. The disassembly is done through IDA Pro, which provides a Python interface to interact with different features from the disassembled file; it allows us to extract the features and save them to a known format, which can be imported later on. 
+
+Another important feature for the two-step process is that it allows the generator to sandbox the generation of graphs. As the data set consists of potentially dangerous malware, it is important to maintain an environment without any risks. 
+
+\begin{algorithm}
+    \caption{"Generating a FCG from a disassembled file."}
+    \label{alg:generate_fcg_alg}
+    \begin{algorithmic}
+    \Function{GenerateFCG}{G}
+    \State{$F \gets Functions(G)$}\;
+    \State{$G_2 \gets (V, E)$}\;
+    \For{each f in F} 
+        \State $addNode(f, V)$\;
+
+        \For{each s in Successors(f)}
+            \State addEdge(V, s)\;
+        \EndFor
+    
+    \EndFor \\
+    \Return{$G_2$}
+    \EndFunction
+    \end{algorithmic}
+\end{algorithm}
+After constructing the FCG, we can extract its features into numerical features. The numerical features include: the total number of nodes, where each node represents a function; the total number of edges, where each edge represents a function call; graph density, which is calculated as the ratio between the number of edges and the maximum number of edges; number of components, which refers to the number of connected components, and therefore how many separate subgraphs exist; clustering coefficient, which is a measure of the degree to which nodes in a graph tend to gather, which provides valuable insight into the local structure of the graph.
+
+\subsection{Graph Vectorization}
+
+To find a deeper understanding of graph connectivity, extracting calculated data such as the density, number of components, and clustering coefficient may not capture the required information to display the complexities of a given graph. In a paper by Ambikavathi and Srivatsa, which focuses on tuning RF hyperparameters using Simulated Annealing (SA) \cite{simanneal}, the authors outline an approach that involves performing random walks on graphs and embedding the findings of these walks into a multidimensional vector representation. We adopt this method by implementing Node2Vec, which allows us to vectorize the FCG and create a vectorized function call graph (FCGV).
+
+To prepare the data for the model and complete this step of data preprocessing, we combine the numerical features of the graph with their corresponding vectorized representations to generate a comprehensive FCG vector. These combined data are then organized into a Pandas DataFrame, enabling detailed analyses on how to effectively integrate different feature groups for a given graph input.
+
+\subsection{Data Imbalance}
+
+\begin{figure}[h!]
+    \centering
+    \includesvg[width=1\linewidth]{graphics/class_imbalance_plot.svg}
+    \caption{Initial Class imbalance}
+    \label{fig:class_imbalance}
+\end{figure}
+
+The received dataset contains a large class imbalance in the data, which can be seen in Figure \ref{fig:class_imbalance}. To compensate for the imbalance, two methods are implemented to obtain a completely balanced dataset.
+
+First, we randomly sampled 2,000 elements from the malware class. Given that the malware class comprises 10 different subclasses, this random sampling ensures a balanced representation of malware types while minimizing the effort required to augment the minority class to match the majority class size.
+
+Second, to increase the size of the benign class set, the Synthetic Minority Oversampling Technique (SMOTE) is used. SMOTE generates synthetic data points by averaging between existing data points in the minority class, thus increasing the size of the minority class. Through this technique, the benign class was expanded to match the size of the malware class, resulting in a balanced dataset with 2,000 elements in each class.
+
+\section{Methodology}
+
+
+\subsection{Random Forest Classifier}
+The Random Forest Classifier is a machine learning method used for classification. Through construction of multiple trees during training, followed by averaging out the results, it is able to generate a low variance, model while mitigating overfitting. These properties make Random Forest Classifier an ideal method used for the classification of malware.
+
+For this paper, the random forest classifier was implemented using sklearn's \textit{RandomForestClassifier} in python. After the preparation of the Dataframe from the preprocessing steps, the implementation requires hyperparameters to tune the model into optimal performance of evaluation metrics such as accuracy, precision, recall and the calculated F1 score.
+
+\subsection{Dataset}
+To evaluate the performance the mode's classification score Random Forest Classifier, the dataset was split into training and test sets. Specifically, 80\% of the dataset was allocated for training and the remaining 20\% was reserved for testing. The training set was further divided into two subsets: 80\% for training the model and 20\% for validation during hyperparameter tuning. This split ensures that the model is trained on a sufficiently large dataset while also providing a separate validation set to tune the hyperparameters effectively.
+
+\subsection{Hyperparameter tuning}
+Our hyperparameter options consist of the data and ranges given in Table \ref{tab:hyperparameter ranges}.
+
+\begin{table}[h!]
+    \centering
+    \begin{tabular}{|c|c|}
+        \hline
+        Parameter & Data Range \\
+        \hline
+        estimators & [10 .. 10 .. 200] \\
+        max depth & [0 .. 10 .. 50] \\
+        minimum samples split & [2, 5, 10] \\
+        minimum leaf samples & [1, 2, 4] \\
+        bootstrapping & [True, False] \\
+        \hline
+    \end{tabular}
+    \caption{Random Forest Parameters and their ranges}
+    \label{tab:hyperparameter ranges}
+\end{table}
+
+\subsubsection{Grid Search}
+... 
+
+\subsubsection{Simulated Annealing}
+To address the challenge of potentially being stuck in local minima and ensure a thorough exploration of the model space, which is shown in Table \ref{tab:hyperparameter ranges}, we implement Simulated Annealing (SA). SA is a particularly effective method for solving complex optimization problems with large search spaces and multiple local optima \cite{simanneal}.
+To address the challenge of local minima, we implemented the Simulated Annealing algorithm, the pseudocode of which is detailed in Algorithm \ref{alg:hyperparam_annealing}. This method enables a thorough exploration of the parameter space, effectively mitigating the risk of converging to suboptimal solutions.
+
+\[
+\theta^* = \arg\max_{\theta} f(\theta)
+\]
+
+
+\begin{algorithm}[h!]
+    \caption{"Simulated Annealing"}
+    \label{alg:hyperparam_annealing}
+    \begin{algorithmic}
+    \Function{SimulateAnnealing}{dataset}
+    \State{$T \gets 10000$}\;
+    \State{$coolingrate \gets 0.99$}\;
+    \State{$iterMax \gets (V, E)$}\;
+    \State{$currParam \gets randomParams()$}
+    \State{$currCost \gets computeCost(currParam)$}
+    \State{$bestParam \gets currParam$}
+    \State{$bestCost = currCost$}
+
+    \For{i from 0 to iterMax} 
+        \State{$newParam \gets randomParams()$}
+        \State{$newCost \gets computeCost(newParam)$}
+        \If{$newCost < currCost$}
+            \State{$currParam \gets newParam$}
+            \State{$currCost \gets newCost$}
+        \Else{
+            \State{$r = rand(0, 1)$}
+            \State{$n = currCost - newCost$}
+            \State{$p \gets e^{\frac{n}{T}}$}
+            \If {$r < p$}
+                \State{$currParam \gets newParam$}
+                \State{$currCost \gets newCost$}
+            \EndIf
+        }
+        \EndIf
+        \If{$currCost < bestCost$}
+            \State{$bestCost \gets currCost$}
+            \State{$bestParam \gets currParam $}
+        \EndIf
+
+        \State{$T \gets T * coolingRate$}
+    \EndFor \\
+    \Return{$G_2$}
+    \EndFunction
+    \end{algorithmic}
+\end{algorithm}
+
+
+\section{Results}
+
+\subsection{}
+
+\begin{figure}[h!]
+    \centering
+    \includesvg[width=1\linewidth]{graphics/base_model_no_vectors_cm.svg}
+    \caption{Confusion Matrix for the model without vector features.}
+    \label{fig:base_model_no_vectors_cm}
+\end{figure}
+
+\begin{figure}[h!]
+    \centering
+    \includesvg[width=1\linewidth]{graphics/base_model_only_vectors_roc_curve.svg}
+    \caption{Performance Metrics for the model without vector features.}
+    \label{fig:base_model_no_vectors_error_bar}
+\end{figure}
+
+
+\section{Discussion}
+
+...
+
+\section{Conclusion}
+
+...
+
+
+\section{Template}
 \label{sect:pdf}
 
 For the production of the electronic manuscript you must use Adobe's
@@ -395,42 +570,77 @@ The acknowledgments should go immediately before the references.  Do
 not number the acknowledgments section. Do not include this section
 when submitting your paper for review.
 
+\nocite{*}
 % include your own bib file like this:
-%\bibliographystyle{acl}
-%\bibliography{acl2015}
+\bibliographystyle{unsrt}
+\bibliography{myreferences}
 
-\begin{thebibliography}{}
+% \begin{thebibliography}{}
 
-\bibitem[\protect\citename{Aho and Ullman}1972]{Aho:72}
-Alfred~V. Aho and Jeffrey~D. Ullman.
-\newblock 1972.
-\newblock {\em The Theory of Parsing, Translation and Compiling}, volume~1.
-\newblock Prentice-{Hall}, Englewood Cliffs, NJ.
+% \bibitem[\protect\citename{Aho and Ullman}1972]{Aho:72}
+% Alfred~V. Aho and Jeffrey~D. Ullman.
+% \newblock 1972.
+% \newblock {\em The Theory of Parsing, Translation and Compiling}, volume~1.
+% \newblock Prentice-{Hall}, Englewood Cliffs, NJ.
 
-\bibitem[\protect\citename{{American Psychological Association}}1983]{APA:83}
-{American Psychological Association}.
-\newblock 1983.
-\newblock {\em Publications Manual}.
-\newblock American Psychological Association, Washington, DC.
+% \bibitem[\protect\citename{{American Psychological Association}}1983]{APA:83}
+% {American Psychological Association}.
+% \newblock 1983.
+% \newblock {\em Publications Manual}.
+% \newblock American Psychological Association, Washington, DC.
 
-\bibitem[\protect\citename{{Association for Computing Machinery}}1983]{ACM:83}
-{Association for Computing Machinery}.
-\newblock 1983.
-\newblock {\em Computing Reviews}, 24(11):503--512.
+% \bibitem[\protect\citename{{Association for Computing Machinery}}1983]{ACM:83}
+% {Association for Computing Machinery}.
+% \newblock 1983.
+% \newblock {\em Computing Reviews}, 24(11):503--512.
 
-\bibitem[\protect\citename{Chandra \bgroup et al.\egroup }1981]{Chandra:81}
-Ashok~K. Chandra, Dexter~C. Kozen, and Larry~J. Stockmeyer.
-\newblock 1981.
-\newblock Alternation.
-\newblock {\em Journal of the Association for Computing Machinery},
-  28(1):114--133.
+% \bibitem[\protect\citename{Chandra \bgroup et al.\egroup }1981]{Chandra:81}
+% Ashok~K. Chandra, Dexter~C. Kozen, and Larry~J. Stockmeyer.
+% \newblock 1981.
+% \newblock Alternation.
+% \newblock {\em Journal of the Association for Computing Machinery},
+%   28(1):114--133.
 
-\bibitem[\protect\citename{Gusfield}1997]{Gusfield:97}
-Dan Gusfield.
-\newblock 1997.
-\newblock {\em Algorithms on Strings, Trees and Sequences}.
-\newblock Cambridge University Press, Cambridge, UK.
+% \bibitem[\protect\citename{Gusfield}1997]{Gusfield:97}
+% Dan Gusfield.
+% \newblock 1997.
+% \newblock {\em Algorithms on Strings, Trees and Sequences}.
+% \newblock Cambridge University Press, Cambridge, UK.
 
-\end{thebibliography}
+% \end{thebibliography}
+\newpage
 
+\begin{titlepage}
+
+\section*{MLVU Information Sheet}
+\vspace{12pt}
+
+\subsubsection*{Group number:} 
+30
+\\
+\subsubsection*{Authors:}
+\vspace{12pt}
+\begin{tabular}{l l}
+name & student number \\
+\hline
+Chantal Ariu & car103 \\
+Lea Chahboun & lch227 \\
+Alex Hilaye & chr696 \\
+Max Rǎulea & mra296 \\
+Jari Roossien & jro246  \\
+\end{tabular}
+\\
+\subsubsection*{Software used:} 
+
+In this project, our preprocessing tasks were done  using Python 3.12 and IDA Pro 9.0. The libraries we used for preprocessing included Headless-Ida, which allowed us to interact with IDA Pro in an automated analysis environment (a headless environment, which means it operates without a graphical user interface), and Networkx, which was important for graph analysis.
+For the machine learning portion of our work, we continued to use Python 3.12. The following libraries were key to our analysis: Pandas, which we used for data manipulation and analysis with DataFrames; sklearn, which provided us with the RandomForestClassifiers and the metrics needed for model evaluation; imbalanced-learn, which we used for the SMOTE technique to address class imbalance; matplotlib, which was used for plotting the Confusion matrix; numpy, our go-to library for numerical computations; and Node2Vec, which was key for the vectorization of graph data. These tools and libraries were essential for building, training, and evaluating our machine learning model.
+\\
+\subsubsection*{Use of AI tools:} 
+In the making of this report and code, we did not use any AI tools such as ChatGPT or Github Copilot. All content, including text, analysis, and conclusions, was done by the authors of the paper.
+\\
+\subsubsection*{Link to code:} 
+\href{https://github.com/xchanti124/ml-malware-detection.git}{GitHub Project Link}
+
+
+\end{titlepage}
 \end{document}
